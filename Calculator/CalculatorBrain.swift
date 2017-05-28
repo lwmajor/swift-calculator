@@ -40,7 +40,8 @@ struct CalculatorBrain {
         "÷": Operation.binary(/),
         "+": Operation.binary(+),
         "−": Operation.binary(-),
-        "=": Operation.equals
+        "=": Operation.equals,
+        "C": Operation.clear
     ]
     
     private var pendingBinaryOperation: PendingBinaryOperation?
@@ -50,6 +51,7 @@ struct CalculatorBrain {
         case unary((Double) -> Double)
         case binary((Double, Double) -> Double)
         case equals
+        case clear
     }
     
     mutating func performOperation(_ symbol: String) {
@@ -63,11 +65,15 @@ struct CalculatorBrain {
                 }
             case .binary(let function):
                 if accumulator != nil {
+                    performPendingBinaryOperation()
                     pendingBinaryOperation = PendingBinaryOperation(function: function, firstOperand: accumulator!)
                     accumulator = nil
                 }
             case .equals:
                 performPendingBinaryOperation()
+            case .clear:
+                accumulator = nil
+                pendingBinaryOperation = nil
             }
         }
     }
